@@ -4,6 +4,16 @@
 
 The official C# SDK for the [Model Context Protocol](https://modelcontextprotocol.io/), enabling .NET applications, services, and libraries to implement and interact with MCP clients and servers. Please visit our [API documentation](https://modelcontextprotocol.github.io/csharp-sdk/api/ModelContextProtocol.html) for more details on available functionality.
 
+## Key Features
+
+- 🚀 **Full MCP support** - Tools, prompts, resources, and sampling
+- 🎨 **UI Metadata Support** - Built-in attributes for ChatGPT Apps SDK and custom UX ([documentation](docs/UI_METADATA.md))
+- 🔌 **Multiple transports** - stdio, HTTP, SSE (Server-Sent Events)
+- 🏗️ **Dependency injection** - Native Microsoft.Extensions.DependencyInjection support
+- 🔐 **OAuth 2.0** - Built-in authentication support
+- ⚡ **Native AOT** - Optimized for fast startup and low memory usage
+- 🌐 **Multi-framework** - Supports .NET 9.0, .NET 8.0, and .NET Standard 2.0
+
 ## Packages
 
 This SDK consists of three main packages:
@@ -121,6 +131,34 @@ public static class EchoTool
     public static string Echo(string message) => $"hello {message}";
 }
 ```
+
+### UI Metadata for ChatGPT Apps
+
+The SDK includes built-in support for UI metadata, making it easy to integrate with ChatGPT's Apps SDK and other UI-enabled MCP clients:
+
+```csharp
+using ModelContextProtocol.Server;
+using System.ComponentModel;
+
+[McpServerToolType]
+public static class TaskManager
+{
+    [McpServerTool]
+    [UiTemplate("ui://widgets/task-board.html")]  // Custom UI template
+    [Locale("en_US")]                              // Internationalization
+    [UiHint("statusCopy", "Task board ready")]     // Status message
+    [Description("Manages tasks with a custom task board UI")]
+    public static string ManageTasks(
+        [Description("Action: list, add, delete")] string action,
+        string? taskId = null)
+    {
+        // Your implementation here
+        return $"Task {action} completed";
+    }
+}
+```
+
+For more information, see the [UI Metadata Documentation](docs/UI_METADATA.md) and [sample project](samples/ChatGptUiExample/).
 
 Tools can have the `McpServer` representing the server injected via a parameter to the method, and can use that for interaction with 
 the connected client. Similarly, arguments may be injected via dependency injection. For example, this tool will use the supplied 

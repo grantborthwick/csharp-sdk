@@ -373,6 +373,35 @@ internal sealed partial class AIFunctionMcpServerTool : McpServerTool
             }
         }
 
+        // Process UiTemplateAttribute
+        var uiTemplateAttr = method.GetCustomAttribute<UiTemplateAttribute>();
+        if (uiTemplateAttr is not null && meta?.ContainsKey(uiTemplateAttr.MetadataKey) is not true)
+        {
+            (meta ??= [])[uiTemplateAttr.MetadataKey] = uiTemplateAttr.TemplateUri;
+        }
+
+        // Process LocaleAttribute
+        var localeAttr = method.GetCustomAttribute<LocaleAttribute>();
+        if (localeAttr is not null && meta?.ContainsKey(localeAttr.MetadataKey) is not true)
+        {
+            (meta ??= [])[localeAttr.MetadataKey] = localeAttr.Locale;
+        }
+
+        // Process UiHintAttribute instances
+        foreach (var hintAttr in method.GetCustomAttributes<UiHintAttribute>())
+        {
+            if (meta?.ContainsKey(hintAttr.Key) is not true)
+            {
+                (meta ??= [])[hintAttr.Key] = hintAttr.ValueType switch
+                {
+                    UiHintAttribute.UiHintValueType.String => hintAttr.Value,
+                    UiHintAttribute.UiHintValueType.Boolean => hintAttr.BoolValue,
+                    UiHintAttribute.UiHintValueType.Numeric => hintAttr.NumericValue,
+                    _ => null
+                };
+            }
+        }
+
         return meta;
     }
 
